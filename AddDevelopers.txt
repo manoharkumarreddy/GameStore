@@ -1,0 +1,318 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  add_developers.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('add_developers');
+if($act eq "Add Developers")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Add_developers ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Add_developers
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String query1, query2, devname;
+     Statement stmt1, stmt2;
+     ResultSet  rset1, rset2;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+
+     "table,th,td{"+ 
+     "border: 1px solid black;"+
+     "border-collapse:collapse;"+
+     "}"+
+     "th,td {"+
+     "padding: 5px;"+
+     "}"+
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Add Developers</h2><br><br>"+
+     "<center>"+
+     "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+     "<tr>"+
+     "<th>Game Title</th>"+
+     "<th>Add Developers</th>"+
+     "<th>Update</th>"+
+     "</tr>";
+     stmt1 = conn.createStatement( );
+     stmt2 = conn.createStatement( );
+     query1 = "select g.title,g.game_info.asin_game from game g";
+     rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {  
+      s1 +=   "<tr><form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/developers_adding.cgi\">"+
+              "<td align=\"center\"><input type=\"hidden\" name=\"id_game\" value="+rset1.getString(2)+">" + rset1.getString(1) + "</td>"+
+              "<td align=\"center\"><select name=\"developer_game\" multiple>";
+
+               query2 = "select d.developer_name,d.developer_id.develop_id from developer d";
+        rset2 = stmt2.executeQuery( query2 );
+        while ( rset2.next( ) )
+        {
+          devname = rset2.getString(1);
+          s1 += "<option value =" + rset2.getInt(2) + ">" + devname  + "</option>";
+	  } 
+	rset2.close();
+        s1 += "</select></td>"+
+        "<td align=\"center\">"+
+        "<input type=\"submit\" name=\"sub\" value=\"Update\"></td></form></tr>";
+      }
+     stmt2.close();
+     rset1.close();
+     stmt1.close();
+     s1 += "</table><br><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"5\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value = \"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "<br>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  developers_adding.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+$id_game = $query->param('id_game');
+my @developer_updating = $query->param('developer_game');
+if($act eq "Update")
+{
+ print("Content-type: text/html\n\n");
+ $id_game =~ s/^\s*(\S*)\s*$/$1/;
+ $id_game =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Developers_adding '$id_game' ";
+ foreach my $developer_game(@developer_updating) {
+     $cmd .= " '$developer_game' ";
+ }
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Developers_adding
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String query1, query2, devname, query3, query4, query5, query6, developer_name;
+     Statement stmt1, stmt2, stmt3, stmt4, stmt5;
+     ResultSet  rset1, rset2, rset3, rset4;
+     int number_rows_affected = 0,number_rows_affected1 = 0;
+     boolean flag = true;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     conn.setAutoCommit(false);
+     try
+     {
+     String s1= "<!DOCTYPE html>"+
+                "<html>"+
+                "<head>"+
+                "<style>"+
+                "table,th,td{"+
+                "border: 1px solid black;"+
+                "border-collapse:collapse;"+
+                "}"+
+                "th,td {"+
+                "padding: 5px;"+
+                "}"+
+                "</style>"+
+                "</head>"+
+                "<body>"+
+                "<h2 align=\"center\">Add Developers</h2><br><br>"+
+                "<center>"+
+                "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+                "<tr>"+
+                "<th>Game Title</th>"+
+                "<th>Add Developers</th>"+
+                "<th>Update</th>"+
+                "</tr>";
+                stmt1 = conn.createStatement( );
+                stmt2 = conn.createStatement( );
+                query1 = "select g.title,g.game_info.asin_game from game g";
+                rset1 = stmt1.executeQuery( query1 );
+                while ( rset1.next( ) )
+                {
+                    s1 +=  "<tr><form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/developers_adding.cgi\">"+
+              "<td align=\"center\"><input type=\"hidden\" name=\"id_game\" value="+rset1.getString(2)+">" + rset1.getString(1) + "</td>"+
+                    "<td align=\"center\"><select name=\"developer_game\" multiple>";
+                    query2 = "select d.developer_name,d.developer_id.develop_id from developer d";
+                    rset2 = stmt2.executeQuery( query2 );
+                    while ( rset2.next( ) )
+                   {
+                     devname = rset2.getString(1);
+                     s1 += "<option value =" + rset2.getInt(2) + ">" + devname  + "</option>";
+                   }
+                   rset2.close();
+                   s1 += "</select></td>"+
+                   "<td align=\"center\">"+
+                   "<input type=\"submit\" name=\"sub\" value=\"Update\"></td></form></tr>";
+               }
+                stmt2.close();
+                rset1.close();
+                stmt1.close();
+                s1 += "</table><br><br>";
+               /* "</form><br>"+
+                "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+                "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+                "</form><br>";*/
+                stmt3 = conn.createStatement();
+                for(int i=1; i<args.length; i++)
+                {
+                  stmt4 = conn.createStatement();
+                  query4 = "select d.developer_name from developer d where d.developer_id.develop_id = "+args[i].toLowerCase().trim()+"";
+                  //System.out.println(query4);
+                  rset4 = stmt4.executeQuery(query4);
+                  rset4.next();
+                  developer_name = rset4.getString(1);
+                  query3 = "select develop_id from table(select g.dev_list from game g where g.game_info.asin_game = '"+args[0].toLowerCase().trim()+"') where develop_id = "+args[i].toLowerCase().trim()+""; 
+                  //System.out.println(query3);
+                  rset3 = stmt3.executeQuery(query3);
+                  if(rset3.next())
+                  {
+                     s1 +=  "<br><strong> The developer "+ developer_name +" already exists </strong><br>";
+                     rset3.close();
+                     //stmt3.close();
+                  }
+                  else
+                  {
+                     stmt5 = conn.createStatement();
+                     query5 = "insert into table(select g.dev_list from game g where g.game_info.asin_game = '"+args[0].toLowerCase().trim()+"') values (developer_typ("+args[i].toLowerCase().trim()+"))";
+                    // System.out.println(query5);
+                     number_rows_affected = stmt5.executeUpdate( query5 );
+                     if(number_rows_affected == 0)
+                     {
+                       flag = false;
+                     }
+                     else
+                     {
+                       query6 = "insert into table(select d.games_list from developer d where d.developer_id.develop_id = "+args[i].toLowerCase().trim()+") values (game_typ('"+args[0].toLowerCase().trim()+"',0))";
+                      // System.out.println(query4);
+                       number_rows_affected1 = stmt5.executeUpdate( query6 );
+                       if(number_rows_affected1 == 0)
+                       {
+                         flag = false;
+                         break; 
+                       }
+                     }
+                    // stmt5.close();
+                    //}
+                     if(flag == false)
+                     { 
+                        conn.rollback();
+                        s1 += "<br><strong> The developer "+ developer_name +" cannot be added because of error.</strong><br>";
+                     }
+                     else
+                     {
+                        conn.commit();
+                        s1 += "<br><strong> The developer "+ developer_name +" has been added to the game successfully. </strong><br>";
+                     }
+                     stmt5.close();
+                 }
+                  rset4.close();
+                  stmt4.close();
+                }
+                 stmt3.close();
+                /* }
+                stmt2.close();
+                rset1.close();
+                stmt1.close();
+                s1 += "</table><br><br>"+
+                "</form><br>"+
+                "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+                "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+                "</form><br>";*/
+                s1 +=  "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+                "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+                "</form><br>"+ 
+                "</center>"+
+                "</body>"+
+                "</html>";
+                System.out.println(s1);
+       }
+       catch ( SQLException ex ){
+         System.out.println( ex );
+       }
+       conn.close();
+    }       
+}   

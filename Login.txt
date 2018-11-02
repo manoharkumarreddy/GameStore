@@ -1,0 +1,199 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl login.pl
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+$type_user = $query->param('type_user');
+$name_user = $query->param('name_user');
+if($act eq "LOGIN")
+{
+ print("Content-type: text/html\n\n");
+ $name_user =~ s/^\s*(\S*)\s*$/$1/;
+ $name_user =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Login ";
+ if($type_user eq "customer") { $cmd .= "'customer' ";}
+ if($type_user eq "system administrator") { $cmd .= "'system administrator' ";}
+ if(!($name_user eq "")) { $cmd .= "'$name_user'";}
+ else {$cmd .= "''";}
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Login 
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     int unfilled_args_count = 0; 
+     for(int i=0; i<args.length; i++)
+     {
+       if(args[i].compareTo("")==0)
+       {
+          unfilled_args_count++;
+       }
+     }
+     if(unfilled_args_count > 0)
+     {
+       System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/login_error.html\">");
+       System.exit(0);
+     }
+     try 
+     {
+       // Create, compose, and execute a statement.
+       Statement stmt = conn.createStatement( );
+       // checking if the user name of users already exists in their database tables and then redirecting them to their respective pages.
+       String query;
+       ResultSet rset;
+       if(args[0].compareTo("customer") == 0)
+       {
+         query = "select customer_name,cust_id from customer where customer_name = '"+args[1].toLowerCase().trim()+"'";
+         rset = stmt.executeQuery(query);
+         if(rset.next())
+         {
+           String s1;
+           s1 = " <!DOCTYPE html>"+
+           "<html>"+
+           "<head>"+
+           "<style>"+
+           /*.button {
+           background-color: #FA8072;
+           border: none;
+           color: white;
+           padding: 15px 32px;
+           text-align: center;
+           text-decoration: none;
+           display: inline-block;
+           font-size: 16px;
+           margin: 4px 2px;
+           cursor: pointer;
+           }*/
+           "</style>"+
+           "</head>"+
+           "<body>"+
+           "<h2 align=\"center\">Welcome Customer</h2><br>"+
+           "<marquee><h3>welcome Customer<h3></marquee><br><br><br>"+
+           "<center>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/search_games.cgi\">"+
+           "<input type=\"hidden\" name=\"user_name\" value=\""+rset.getString(1)+"\">"+
+           "<input type=\"submit\" name=\"search_games\" value=\"Search Games\">"+
+           "</form><br><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data_for_customers.cgi\">"+
+           "<input type=\"hidden\" name=\"user_name\" value=\""+rset.getString(1)+"\">"+
+           "<input type=\"submit\" name=\"list_data_for_customers\" value=\"List Data\">"+
+           "</form><br><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+           "<input type=\"submit\" align=\"right\" name=\"logout\" value=\"Logout\"></form><br><br>"+
+           "</center>"+
+           "</body>"+
+           "</html>";
+           System.out.println(s1);
+         }
+         else
+         {
+           System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/invalid_username.html\">");
+           System.exit(0);
+         }
+         rset.close();
+         stmt.close();
+       }
+        if(args[0].compareTo("system administrator") == 0)
+       {
+         query = "select admin_name from admin where admin_name = '"+args[1].toLowerCase().trim()+"'";
+	     rset = stmt.executeQuery(query);
+         if(rset.next())
+         {
+           String s1="<!DOCTYPE html>"+
+           "<html>"+
+           "<head>"+
+           "<style>"+
+           /*.button {
+           background-color: #FA8072;
+           border: none;
+           color: white;
+           padding: 15px 32px;
+           text-align: center;
+           text-decoration: none;
+           display: inline-block;
+           font-size: 16px;
+           margin: 4px 2px;
+           cursor: pointer;
+           }*/
+           "</style>"+
+           "</head>"+
+           "<body>"+
+           "<h2 align=\"center\">Welcome Administrator</h2><br>"+
+           "<marquee><h3>welcome administrator<h3></marquee><br><br><br>"+
+           "<center>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/enter_games.cgi\">"+
+           "<input type=\"submit\" name=\"enter_games\" value=\"Enter Games\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/delete_developers.cgi\">"+
+           "<input type=\"submit\" name=\"delete_developers\" value=\"Delete Developers\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/update_games_price.cgi\">"+
+           "<input type=\"submit\" name=\"update_games_price\" value=\"Update Games Price\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/add_developers.cgi\">"+
+           "<input type=\"submit\" name=\"add_developers\" value=\"Add Developers\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data.cgi\">"+
+           "<input type=\"submit\" name=\"list_data\" value=\"List Data\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+           "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+           "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/reset.cgi\">"+
+           "<br>"+
+           "<input type = \"password\" name=\"password\">"+
+           "<input type=\"submit\" value=\"Reset Database\" name=\"reset_database\">"+
+           "</form>"+
+           "</center>"+
+           "</body>"+
+           "</html>";
+           System.out.println(s1);
+         }
+         else
+         {
+          // System.out.print("You entered an invalid user name. Please enter a valid user name.");
+           System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/invalid_username.html\">");
+           System.exit(0);
+         }
+	     rset.close();
+	     stmt.close();
+        } 
+      }  
+      catch(SQLException ex) 
+      {  
+        System.out.println(ex);
+      }
+      conn.close();
+   }       
+}   

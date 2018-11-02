@@ -1,0 +1,129 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  sign_up.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+$type_user = $query->param('type_user');
+$name_user = $query->param('name_user');
+if($act eq "SIGN UP")
+{
+ print("Content-type: text/html\n\n");
+ $name_user =~ s/^\s*(\S*)\s*$/$1/;
+ $name_user =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Sign_up ";
+ if($type_user eq "customer") { $cmd .= "'customer' ";}
+ if($type_user eq "developer") {$cmd .= "'developer' ";}
+ if (!($name_user eq "")) {$cmd .= "'$name_user'";}
+ else {$cmd .= "''";}
+#print($cmd);
+system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Sign_up 
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     int unfilled_args_count = 0; 
+     for(int i=0; i<args.length; i++)
+     {
+       if(args[i].compareTo("")==0)
+       {
+          unfilled_args_count++;
+       }
+     }
+     if(unfilled_args_count > 0)
+     {
+       System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/sign_up_error.html\">");
+       System.exit(0);
+     }
+     try 
+     {
+       // Create, compose, and execute a statement.
+       Statement stmt = conn.createStatement( );
+       // checking if the user name of customer already exists or not in customer table and if it is not there, then inserting the user name into customer table.
+       String query;
+       ResultSet rset;
+       if(args[0].compareTo("customer") == 0)
+       {
+         query = "select customer_name from customer where customer_name = '"+args[1].toLowerCase().trim()+"'";
+         rset = stmt.executeQuery(query);
+         if(rset.next())
+         {
+           System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/user_name_exists.html\">");
+           rset.close();
+           stmt.close();
+           conn.close();
+           System.exit(0);
+         }
+         else
+         {
+           query = "insert into customer(cust_id,customer_name,account) values (cust_id.NEXTVAL,'"+args[1].toLowerCase().trim()+"',account_data())";
+           stmt.executeUpdate(query);
+         }
+        // System.out.print("<strong>Succesfully Signed Up. Now, Please login and njoy the services. Thank you.<strong>");
+         System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/sign_up_successful.html\">");
+         rset.close();
+         stmt.close();
+       }
+        if(args[0].compareTo("developer") == 0)
+       {
+         query = "select developer_name from developer where developer_name = '"+args[1].toLowerCase().trim()+"'";
+	 
+         rset = stmt.executeQuery(query);
+         if(rset.next())
+         {
+           System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/user_name_exists.html\">");
+           rset.close();
+           stmt.close();
+           conn.close();
+           System.exit(0);
+         }
+         else
+         {
+           query = "insert into developer values (developer_typ(develop_id.NEXTVAL),'"+args[1].toLowerCase().trim()+"',game_data())";
+           stmt.executeUpdate(query);
+         }
+        // System.out.print("<strong>Succesfully Signed Up. Now, Please login and njoy the services. Thank you.<strong>");
+         System.out.print("<meta http-equiv=\"refresh\" content=\"0;URL=/~mdasannagari/513/1/sign_up_successful.html\">");
+	 rset.close();
+	 stmt.close();
+       } 
+     }  
+     catch(SQLException ex) 
+     {  
+        System.out.println(ex);
+     }
+     conn.close();
+   }       
+}   

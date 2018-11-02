@@ -1,0 +1,611 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('list_data');
+if($act eq "List Data")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_data ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_data
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">List Data</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data1.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Games\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data2.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Developers\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data3.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Customers\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"6\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value=\"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "</center>"+
+     "</form>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_data1.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('list');
+if($act eq "List Games")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_games ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_games
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">List Data</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data1.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Games\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data2.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Developers\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data3.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Customers\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<table align=\"center\" style=\"width:20%\" border=\"1\">"+
+     "<tr>"+
+     "<th>Games</th>"+
+     "</tr>";
+     Statement stmt1 = conn.createStatement();
+     String query1 = "select g.title,g.game_info.asin_game from game g";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       s1 += "<tr><td align=\"center\"><a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_game_data.cgi?game_id="+rset1.getString(2)+"\">"+rset1.getString(1)+"</a></td></tr>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 += "</table>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_game_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$game_id = $query->url_param('game_id');
+print("Content-type: text/html\n\n");
+$game_id =~ s/^\s*(\S*)\s*$/$1/;
+$game_id =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+$cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_game_data $game_id " ;
+#print($cmd);
+system($cmd);
+
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_game_data
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt1,stmt2;
+     String query1,query2;
+     ResultSet rset1,rset2;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Game Data</h2><br><br>"+
+     "<center>"+
+     "<table align=\"center\" style=\"width:20%\" border=\"1\">"+
+     "<tr>"+
+     "<th>Game ASIN</th>"+
+     "<th>Game Title</th>"+
+     "<th>Game Developers</th>"+
+     "<th>Game Price</th>"+
+     "</tr>";
+     stmt1 = conn.createStatement();
+     stmt2 = conn.createStatement();
+     query1 = "select g.game_info.asin_game,g.title,g.game_info.game_price from game g where g.game_info.asin_game='"+args[0].toLowerCase().trim()+"'";
+     rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       s1 += "<tr><td align=\"center\">"+rset1.getString(1)+"</td>"+
+             "<td align=\"center\">"+rset1.getString(2)+"</td>";
+       query2 = "select d.developer_name,d.developer_id.develop_id from table(select dev_list from game g where g.game_info.asin_game = '"+args[0].toLowerCase().trim()+"') t join developer d on t.develop_id = d.developer_id.develop_id";
+       rset2 = stmt2.executeQuery( query2 );
+       s1 += "<td>";
+     while ( rset2.next( ) )
+     {
+       s1 += "<a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_developer_data.cgi?developer_id="+rset2.getInt(2)+"\">"+rset2.getString(1)+"</a>&nbsp;";
+     }
+       s1 += "</td>";
+       rset2.close();
+       s1 += "<td align=\"center\">"+rset1.getString(3)+"</td></tr>";
+     }
+     stmt2.close();
+     rset1.close();
+     stmt1.close();
+     s1 += "</table>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_data2.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('list');
+if($act eq "List Developers")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_developers ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_developers
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">List Data</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data1.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Games\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data2.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Developers\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data3.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Customers\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<table align=\"center\" style=\"width:20%\" border=\"1\">"+
+     "<tr>"+
+     "<th>Developers</th>"+
+     "</tr>";
+     Statement stmt1 = conn.createStatement();
+     String query1 = "select d.developer_name,d.developer_id.develop_id from developer d";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       s1 += "<tr><td align=\"center\"><a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_developer_data.cgi?developer_id="+rset1.getString(2)+"\">"+rset1.getString(1)+"</a></td></tr>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 += "</table>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_developer_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$developer_id = $query->url_param('developer_id');
+print("Content-type: text/html\n\n");
+$developer_id =~ s/^\s*(\S*)\s*$/$1/;
+$developer_id =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+$cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_developer_data $developer_id " ;
+#print($cmd);
+system($cmd);
+
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_developer_data
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt1,stmt2;
+     String query1,query2;
+     ResultSet rset1,rset2;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Developer Data</h2><br><br>"+
+     "<center>"+
+     "<table align=\"center\" style=\"width:20%\" border=\"1\">"+
+     "<tr>"+
+     "<th>Developer ID</th>"+
+     "<th>Developer Name</th>"+
+     "<th>Games List</th>"+
+     "</tr>";
+     stmt1 = conn.createStatement();
+     stmt2 = conn.createStatement();
+     query1 = "select d.developer_id.develop_id,d.developer_name from developer d where d.developer_id.develop_id = "+args[0].toLowerCase().trim()+"";
+     rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       s1 += "<tr><td align=\"center\">"+rset1.getString(1)+"</td>"+
+             "<td align=\"center\">"+rset1.getString(2)+"</td>";
+       query2 = "select g.title,g.game_info.asin_game from table(select games_list from developer d where d.developer_id.develop_id = '"+args[0].toLowerCase().trim()+"') t join game g on t.asin_game = g.game_info.asin_game";
+       rset2 = stmt2.executeQuery( query2 );
+       s1 += "<td align=\"center\">";
+     while ( rset2.next( ) )
+     {
+       s1 += "<a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_game_data.cgi?game_id="+rset2.getString(2)+"\">"+rset2.getString(1)+"</a>&nbsp;";
+     }
+       s1 += "</td>";
+       rset2.close();
+       s1 += "</tr>";
+     }
+     stmt2.close();
+     rset1.close();
+     stmt1.close();
+     s1 += "</table>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_data3.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('list');
+if($act eq "List Customers")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_customers ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  List_customers
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+ 
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">List Data</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data1.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Games\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data2.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Developers\">"+"</center>"+"</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_data3.cgi\">"+"<center>"+
+     "<input type=\"submit\" name=\"list\" value=\"List Customers\">"+"</center>"+"</form>"+"<br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<table align=\"center\" style=\"width:20%\" border=\"1\">"+
+     "<tr>"+
+     "<th>Customers</th>"+
+     "</tr>";
+     Statement stmt1 = conn.createStatement();
+     String query1 = "select c.customer_name,c.cust_id from customer c";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       s1 += "<tr><td align=\"center\"><a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_customer_data.cgi?customer_id="+rset1.getInt(2)+"\">"+rset1.getString(1)+"</a></td></tr>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 += "</table>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  list_customer_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$customer_id = $query->url_param('customer_id');
+print("Content-type: text/html\n\n");
+$customer_id =~ s/^\s*(\S*)\s*$/$1/;
+$customer_id =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+$cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom List_customer_data $customer_id " ;
+#print($cmd);
+system($cmd);
+
+

@@ -1,0 +1,401 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  enter_games.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('enter_games');
+if($act eq "Enter Games")
+{
+ print("Content-type: text/html\n\n");
+ $name_user =~ s/^\s*(\S*)\s*$/$1/;
+ $name_user =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Enter_games ";
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Enter_games 
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1="<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<h2 align=\"center\"> Enter Game Data</h2>"+
+     "</head><br><br>"+
+     "<body>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/game_data.cgi\">"+
+     "Game ASIN* &nbsp;:"+
+     "<input type=\"text\" name=\"asin_game\"><br>"+
+     "<br>"+
+     "Game Title* &nbsp;&nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"title_game\"><br>"+
+     "<br>"+
+     "Game Developer* &nbsp;:"+
+     " <select name=\"developer_game\" multiple>";
+     Statement stmt1 = conn.createStatement( );
+     String query1 = "select d.developer_name,d.developer_id.develop_id from developer d";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       String devname = rset1.getString(1);
+       s1 += "<option value =\"" + rset1.getInt(2) + "\">" + devname  + "</option>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 +=  "</select><br><br>Hold ctrl button and select multiple options - Windows<br>Hold cmd button and select multiple options - Mac"+
+     "<br><br>"+
+     "Game Price* &nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"price_game\"><br>"+
+     "<br><br><br>"+
+     "<input type=\"submit\" name=\"sub\" value=\"ENTER\">&nbsp;&nbsp;&nbsp;"+
+     "<input type=\"reset\" name=\"res\" value=\"RESET\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"2\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value=\"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  game_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+$asin_game = $query->param('asin_game');
+$title_game = $query->param('title_game');
+my @developer_games = $query->param('developer_game');
+$price_game = $query->param('price_game');
+if($act eq "ENTER")
+{
+ print("Content-type: text/html\n\n");
+ $asin_game =~ s/^\s*(\S*)\s*$/$1/;
+ $asin_game =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $title_game =~ s/^\s*(\S*)\s*$/$1/;
+ $title_game =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $price_game =~ s/^\s*(\S*)\s*$/$1/;
+ $price_game =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Game_data ";
+ if(!($asin_game eq "")) { $cmd .= " '$asin_game' "; }
+ else { $cmd .= "''"; }
+ if(!($title_game eq "")) { $cmd .= "\"$title_game\" "; }
+ else { $cmd .= "''"; }
+ foreach my $developer_game(@developer_games) { $cmd .= " '$developer_game' "; }
+ if(!($price_game eq "")) { $cmd .= "'$price_game'"; } 
+ else { $cmd .= "''"; }
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Game_data
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     conn.setAutoCommit(false);
+     int unfilled_args_count = 0; 
+     for(int i=0; i<args.length; i++)
+     {
+       if(args[i].compareTo("")==0)
+       {
+          unfilled_args_count++;
+       }
+     }
+     if(unfilled_args_count > 0)
+     {
+       String s1="<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<h2 align=\"center\"> Enter Game Data</h2>"+
+     "</head><br><br>"+
+     "<body>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/game_data.cgi\">"+
+     "Game ASIN* &nbsp;:"+
+     "<input type=\"text\" name=\"asin_game\"><br>"+
+     "<br>"+
+     "Game Title* &nbsp;&nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"title_game\"><br>"+
+     "<br>"+
+     "Game Developer* &nbsp;:"+
+     " <select name=\"developer_game\" multiple>";
+     Statement stmt1 = conn.createStatement( );
+     String query1 = "select d.developer_name,d.developer_id.develop_id from developer d";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       String devname = rset1.getString(1);
+       s1 += "<option value =\"" + rset1.getInt(2)+ "\">" + devname  + "</option>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 +=  "</select><br><br>Hold ctrl button and select multiple options - Windows<br>Hold cmd button and select multiple options - Mac"+
+     "<br><br>"+
+     "Game Price* &nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"price_game\"><br>"+
+     "<br><br><br>"+
+     "<input type=\"submit\" name=\"sub\" value=\"ENTER\">&nbsp;&nbsp;&nbsp;"+
+     "<input type=\"reset\" name=\"res\" value=\"RESET\">"+
+     "<strong> All the fields(*) need to entered </strong>"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     System.exit(0);
+     }
+     int number_rows_affected=0,number_rows_affected1=0;
+     try 
+     {
+       // Create, compose, and execute a statement.
+       Statement stmt = conn.createStatement( );
+       String query,query_dev_update;
+       ResultSet rset;
+       boolean flag=true;
+       query = "select g.game_info.asin_game from game g where g.game_info.asin_game = '"+args[0].toLowerCase().trim()+"'";
+       rset = stmt.executeQuery(query);
+       if(rset.next())
+         {
+           String s1="<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<h2 align=\"center\"> Enter Game Data</h2>"+
+     "</head><br><br>"+
+     "<body>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/game_data.cgi\">"+
+     "Game ASIN* &nbsp;:"+
+     "<input type=\"text\" name=\"asin_game\"><br>"+
+     "<br>"+
+     "Game Title* &nbsp;&nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"title_game\"><br>"+
+     "<br>"+
+     "Game Developer* &nbsp;:"+
+     " <select name=\"developer_game\" multiple>";
+     Statement stmt1 = conn.createStatement( );
+     String query1 = "select d.developer_name,d.developer_id.develop_id from developer d";
+     ResultSet rset1 = stmt.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {
+       String devname = rset1.getString(1);
+       s1 += "<option value =\"" + rset1.getInt(2) + "\">" + devname  + "</option>";
+     }
+     rset1.close();
+     stmt1.close();
+     s1 +=  "</select><br><br>Hold ctrl button and select multiple options - Windows<br>Hold cmd button and select multiple options - Mac"+
+     "<br><br>"+
+     "Game Price* &nbsp;&nbsp;:"+
+     "<input type=\"text\" name=\"price_game\"><br>"+
+     "<br><br><br>"+
+     "<input type=\"submit\" name=\"sub\" value=\"ENTER\">&nbsp;&nbsp;&nbsp;"+
+     "<input type=\"reset\" name=\"res\" value=\"RESET\">"+
+     "<br><br><strong> Game data already exists. </strong><br>"+ 
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+           rset.close();
+           stmt.close();
+           conn.close();
+           System.exit(0);
+         }
+         else
+         {
+           String developers_data = "developer_data(";
+           for(int i=2;i <args.length - 1; i++)
+           {
+            
+             developers_data += "developer_typ("+args[i].toLowerCase().trim()+")";
+             if(i != (args.length - 2))
+             {
+               developers_data += ",";
+             }
+           }
+           developers_data += ")";
+           String newgame = "";
+           String gamename = args[1].toLowerCase().trim();
+           
+	 // System.out.println(gamename);
+           for(int g=0; g<gamename.length(); g++)
+           {
+             if(gamename.charAt(g) == '\'')
+             {
+               newgame += "''";
+             }
+             else
+             {
+               newgame += gamename.charAt(g);
+             }
+           }
+       //    System.out.println(newgame);
+	
+           query = "insert into game(game_info,title,dev_list) values (game_typ('"+args[0].toLowerCase().trim()+"',"+args[args.length - 1].toLowerCase().trim()+"),'"+newgame+"',"+developers_data+")";
+         //System.out.print(query);
+         number_rows_affected =  stmt.executeUpdate(query);
+         }
+           String s1="<!DOCTYPE html>"+
+           "<html>"+
+           "<head>"+
+           "<h2 align=\"center\"> Enter Game Data</h2>"+
+           "</head><br><br>"+
+           "<body>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/game_data.cgi\">"+
+           "<center>"+
+           "Game ASIN* &nbsp;:"+
+           "<input type=\"text\" name=\"asin_game\"><br>"+
+           "<br>"+
+           "Game Title* &nbsp;&nbsp;&nbsp;:"+
+           "<input type=\"text\" name=\"title_game\"><br>"+
+           "<br>"+
+           "Game Developer* &nbsp;:"+
+           " <select name=\"developer_game\" multiple>";
+
+           Statement stmt1 = conn.createStatement( );
+           String query1 = "select d.developer_name,d.developer_id.develop_id from developer d";
+           ResultSet rset1 = stmt1.executeQuery( query1 );
+           while ( rset1.next( ) )
+          {
+             String devname = rset1.getString(1);
+             s1 += "<option value =\"" + rset1.getInt(2) + "\">" + devname  + "</option>";
+          }  
+          rset1.close();
+          stmt1.close();
+
+          s1 +=  "</select><br><br>Hold ctrl button and select multiple options - Windows<br>Hold cmd button and select multiple options - Mac"+
+          "<br><br>"+
+          "Game Price* &nbsp;&nbsp;:"+
+          "<input type=\"text\" name=\"price_game\"><br>"+
+          "<br><br><br>"+
+          "<input type=\"submit\" name=\"sub\" value=\"ENTER\">&nbsp;&nbsp;&nbsp;"+
+          "<input type=\"reset\" name=\"res\" value=\"RESET\">";
+          if(number_rows_affected == 0)
+          {
+            flag = false;
+          }
+          else
+          {
+            for(int i=2; i<args.length - 1; i++)
+            {
+              query_dev_update = "insert into table (select games_list from developer d where d.developer_id.develop_id="+args[i].toLowerCase().trim()+") values (game_typ('"+args[0].toLowerCase().trim()+"',0))";
+              number_rows_affected1 = stmt.executeUpdate(query_dev_update);
+              if(number_rows_affected1 == 0)
+              {
+                flag = false;
+                break;
+              }
+            }
+           }
+           if(flag == false)
+           {
+             conn.rollback();
+             s1 += "<br><br><strong> Entering game data unsuccessful </strong><br>";
+           }
+           else
+           {
+             conn.commit();
+             s1 += "<br><br><strong> Game data entered successfully </strong><br>";
+           }
+           s1 += "</form><br>"+
+           "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+           "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+           "</form><br>"+
+           "</center>"+
+           "</body>"+
+           "</html>";
+           System.out.println(s1);
+           rset.close();
+           stmt.close();
+         }  
+     catch(SQLException ex) 
+     {  
+        System.out.println(ex);
+     }
+     conn.close();
+   }       
+}   

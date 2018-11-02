@@ -1,0 +1,261 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  update_games_price.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('update_games_price');
+if($act eq "Update Games Price")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Update_games_price ";
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Update_games_price 
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+
+     "table,th,td{"+ 
+     "border: 1px solid black;"+
+     "border-collapse:collapse;"+
+     "}"+
+     "th,td {"+
+     "padding: 5px;"+
+     "}"+
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Update Games Price</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/price_update.cgi\">"+
+     "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+     "<tr>"+
+     "<th>Select Game</th>"+
+     "<th>Game Title</th>"+
+     "<th>Original Price</th>"+
+     "<th>Update Price</th>"+
+     "</tr>";
+     Statement stmt1 = conn.createStatement( );
+     String query1 = "select g.game_info.asin_game,g.title,g.game_info.game_price from game g";
+     ResultSet rset1 = stmt1.executeQuery( query1 );
+     int q = 0;
+     while ( rset1.next( ) )
+     { 
+       q++;
+       s1 += "<tr>"+"<td align=\"center\"><input type=\"checkbox\" name=\"game_select_"+q+"\" value=\"" + rset1.getString(1) + "\"></td>"+  
+       "<td>" + rset1.getString(2) + "</td>"+
+       "<td>" + rset1.getString(3) + "</td>"+
+       "<td align=\"center\"><input type=\"text\" name=\"price_"+q+"\"></td>"+"</tr>";
+     }
+     s1 += "<input type=\"hidden\" name=\"row_count\" value=\""+q+"\">";
+     rset1.close();
+     stmt1.close();
+     s1 += "</table><br><br>"+
+     "<input type=\"submit\" name=\"sub\" value=\"Update\">&ensp;&ensp;"+
+     "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"4\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value=\"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  price_update.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+$row_count = $query->param('row_count');
+my $yes_no = true;
+my $counter = 0;
+if($act eq "Update")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Price_update ";
+ for(my $q=1; $q <= $row_count; $q++)
+ {
+   $game_select = $query->param('game_select_'.$q);
+   $price = $query->param('price_'.$q);
+   $price =~ s/^\s*(\S*)\s*$/$1/;
+   $price =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+   if($game_select eq "")
+   {
+       $counter++;
+   }
+   else 
+   {
+     #print("-$price-");
+     if($price eq "")
+     {
+       $yes_no = false;
+       break;
+     }
+     else
+     {
+       $cmd1 .= " $game_select ";
+       $cmd1 .= " $price ";
+     }
+   }
+ }
+ if($counter == $row_count)
+ {
+    $cmd1 = " ";
+ }
+ if($yes_no eq false)
+ {
+    $cmd1 = " $yes_no "; 
+ }
+ $cmd .= $cmd1;
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  java.util.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class Price_update
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt;
+     String query;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "</head>"+
+     "<body>"+
+     "<center>";
+     try
+     {
+       if(args.length == 0)
+       {
+         s1 += "<strong> NO game has been selected and the correspoding price has not been updated. </strong>";
+       }
+       else if(args[0].toLowerCase().trim().compareTo("false") == 0)
+       {
+         s1 += "<strong> Some game or games have been selected but their corresponding prices haven't been entered. </strong>"; 
+       }	
+       else
+       { 
+         stmt = conn.createStatement();
+         int number_rows_affected = 0;
+         float new_price;
+         for(int i=0; i<args.length; i+=2)
+         {
+            new_price  = Float.parseFloat(args[i+1]);
+            if(new_price >= 0.0)
+            {
+               query = "Update game g set g.game_info.game_price = "+args[i+1].toLowerCase().trim()+" where g.game_info.asin_game = '"+args[i].toLowerCase().trim()+"'";
+            //System.out.print(query);
+            //System.out.println(query);
+               number_rows_affected = stmt.executeUpdate(query);
+            }
+            else
+            {
+              s1 += "<strong> You have given negative price. Please give positive price. </strong>";
+            }
+         }
+         stmt.close();
+         if(number_rows_affected == 0)
+         {
+            s1 += "<br><strong>The game price data has not been updated beacuse of error.<strong>";
+         }
+         else
+         {
+            s1 += "<strong>Games price updated successfully.</strong>";
+         }  
+       }
+       s1 += "</center>"+
+       "</body>"+
+       "</html>";
+       System.out.print(s1);
+     }
+     catch(SQLException ex)
+     {
+        System.out.print(ex);
+     }
+     conn.close();   
+   }       
+}   

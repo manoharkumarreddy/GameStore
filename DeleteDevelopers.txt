@@ -1,0 +1,278 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  delete_developers.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('delete_developers');
+if($act eq "Delete Developers")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Delete_developers ";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Delete_developers
+{
+  public static void main(String[] args) throws SQLException
+  {
+      String query1;
+      Statement stmt1;
+      ResultSet  rset1;
+      String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+
+     "table,th,td{"+ 
+     "border: 1px solid black;"+
+     "border-collapse:collapse;"+
+     "}"+
+     "th,td {"+
+     "padding: 5px;"+
+     "}"+
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Delete Developers</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/developers_deleting.cgi\">"+
+     "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+     "<tr>"+
+     "<th>Select Developer</th>"+
+     "<th>Developers Name</th>"+
+     "</tr>";
+     stmt1 = conn.createStatement( );
+     query1 = "select d.developer_id.develop_id,d.developer_name from developer d";
+     rset1 = stmt1.executeQuery( query1 );
+     while ( rset1.next( ) )
+     {  
+       s1 +=  "<td align=\"center\"><input type=\"checkbox\" name=\"developer_select\" value="+rset1.getInt(1)+"></td>"+
+              "<td align=\"center\">"+rset1.getString(2)+"</td></tr>";
+      }
+     rset1.close();
+     stmt1.close();
+     s1 += "</table><br><br>"+
+     "<input type=\"submit\" name=\"sub\" value=\"Delete\">&nbsp;&nbsp;&nbsp;"+
+     "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"3\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value=\"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  developers_deleting.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('sub');
+my @developers_del_update = $query->param('developer_select');
+if($act eq "Delete")
+{
+ print("Content-type: text/html\n\n");
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Developers_deleting ";
+ foreach my $developer_select(@developers_del_update) {
+     $cmd .= " $developer_select ";
+ }
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class  Developers_deleting
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt,stmt1,stmt2,stmt3;
+     String query,query1,query2,query3,query4,developer_name,s1;
+     ResultSet rset1,rset2,rset3;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     conn.setAutoCommit(false);
+     int number_rows_affected=0,number_rows_affected1=0;
+     boolean flag = true;
+     try 
+     {      
+            s1="<!DOCTYPE html>"+
+               "<html>"+
+               "<head>"+
+               "<style>"+
+               "table,th,td{"+
+               "border: 1px solid black;"+
+               "border-collapse:collapse;"+
+               "}"+
+               "th,td {"+
+               "padding: 5px;"+
+               "}"+
+               "</style>"+
+               "</head>"+
+               "<body>"+
+               "<h2 align=\"center\">Delete Developers</h2><br><br>"+
+               "<center>"+
+               "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/developers_deleting.cgi\">"+
+               "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+               "<tr>"+
+               "<th>Select Developer</th>"+
+               "<th>Developers Name</th>"+
+               "</tr>";
+               stmt1 = conn.createStatement( );
+               query1 = "select d.developer_id.develop_id,d.developer_name from developer d";
+               rset1 = stmt1.executeQuery( query1 );
+               while ( rset1.next( ) )
+              {
+                 s1 +=  "<td align=\"center\"><input type=\"checkbox\" name=\"developer_select\" value="+rset1.getInt(1)+"></td>"+
+                 "<td align=\"center\">"+rset1.getString(2)+"</td></tr>";
+              }
+              rset1.close();
+              stmt1.close();
+              s1 += "</table><br><br>"+
+              "<input type=\"submit\" name=\"sub\" value=\"Delete\">&nbsp;&nbsp;&nbsp;"+
+              "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+              "</form><br>"+
+              "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+              "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+              "</form><br>";
+ 
+           // Create, compose, and execute a statement.
+           for(int i=0; i<args.length; i++)
+           { 
+             stmt = conn.createStatement();
+             stmt3 = conn.createStatement();
+             query4 = "select d.developer_name from developer d where d.developer_id.develop_id = "+args[i].toLowerCase().trim()+"";
+             rset3 = stmt3.executeQuery(query4);
+             if(rset3.next())
+	     {
+               developer_name = rset3.getString(1); 
+	       rset3.close();
+	     }
+	     else 
+             {
+	       rset3.close();
+	       continue;
+	     }
+             stmt2 = conn.createStatement();
+             query2 = "select g.asin_game from developer d,table(d.games_list) g where d.developer_id.develop_id = "+args[i].toLowerCase().trim()+"";
+             rset2 = stmt2.executeQuery(query2);
+             while(rset2.next())
+             {
+                query3 = "delete from table(select g.dev_list from game g where g.game_info.asin_game = '"+rset2.getString(1)+"') where develop_id = "+args[i].toLowerCase().trim()+"";
+                number_rows_affected1 = stmt.executeUpdate(query3);
+             }
+             rset2.close();
+             stmt2.close();
+             if(number_rows_affected1 == 0)
+             {
+               flag = false;
+             }
+             else
+             {
+               query = "delete from developer d where d.developer_id.develop_id = "+args[i].toLowerCase().trim()+"";
+               number_rows_affected = stmt.executeUpdate(query);
+               if(number_rows_affected == 0)
+               {
+                 flag = false;
+                 break;
+               }
+             }
+             if(flag == false)
+             {
+               conn.rollback();
+               s1 += "<strong> The developer "+developer_name+" has not been deleted because of some internal error. </strong><br>";
+             }
+             else
+             {
+               conn.commit();
+              s1 += "<strong> The developer "+developer_name+" has been deleted successfully. </strong><br>";
+            }
+              rset3.close();
+              stmt3.close();
+              stmt.close();
+           }
+             s1 += "</center>"+
+              "</body>"+
+              "</html>";
+             System.out.println(s1);
+     } 
+     catch(SQLException ex) 
+     {  
+        System.out.println(ex);
+     }
+     conn.close();
+   }       
+}   

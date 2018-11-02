@@ -1,0 +1,492 @@
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  search_games.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('search_games');
+$user_name = $query->param('user_name');
+if($act eq "Search Games")
+{
+ print("Content-type: text/html\n\n");
+ $user_name =~ s/^\s*(\S*)\s*$/$1/;
+ $user_name =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Search_games \"$user_name\"";
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class Search_games
+{
+  public static void main(String[] args) throws SQLException
+  {
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Search Games</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/search_games_data.cgi\">"+
+     "Search Games by Developer Names:&ensp;"+
+     "<input type=\"text\" name=\"games_search\">"+"<br>"+
+     "<input type=\"hidden\" name=\"name_user\" value=\""+args[0].toLowerCase().trim()+"\"><br>"+
+     "<input type=\"submit\" name=\"search_data\" value=\"Search\">&ensp;&ensp;"+
+     "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/display_source.cgi\">"+
+     "<br>"+
+     "<input type = \"hidden\" name=\"interface\" value=\"7\">"+
+     "<input type = \"password\" name=\"password\">"+
+     "<input type=\"submit\" value=\"Display Source\" name=\"source_code\">"+
+     "</form>"+
+     "</center>"+
+     "</body>"+
+     "</html>";
+     System.out.println(s1);
+     conn.close();
+     
+   }       
+}   
+
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  search_games_data.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('search_data');
+$games_search = $query->param('games_search');
+$name_user = $query->param('name_user');
+if($act eq "Search")
+{
+ print("Content-type: text/html\n\n");
+ $games_search =~ s/^\s*(\S*)\s*$/$1/;
+ $games_search =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $name_user =~ s/^\s*(\S*)\s*$/$1/;
+ $name_user =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Search_games_data ";
+ if(!($games_search eq "")) { $cmd .= " '$games_search' "; } 
+ else { $cmd .= "''";}
+ if(!($name_user eq "")) { $cmd .= " '$name_user' "; }
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  java.util.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class Game
+{
+  String g_id;
+  String g_name;
+  double g_price;
+  int count;
+}
+class Search_games_data
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt,stmt1;
+     String query,query1;
+     ResultSet rset,rset1;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "<style>"+
+     "table,th,td{"+
+     "border: 1px solid black;"+
+     "border-collapse:collapse;"+
+     "}"+
+     "th,td {"+
+     "padding: 5px;"+
+     "}"+
+     "</style>"+
+     "</head>"+
+     "<body>"+
+     "<h2 align=\"center\">Search Games</h2><br><br>"+
+     "<center>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/search_games_data.cgi\">"+
+     "Search Games by Developer Names:&ensp;"+
+     "<input type=\"text\" name=\"games_search\">"+"<br>"+
+     "<input type=\"hidden\" name=\"name_user\" value=\""+args[1].toLowerCase().trim()+"\"><br>"+
+     "<input type=\"submit\" name=\"search_data\" value=\"Search\">&ensp;&ensp;"+
+     "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/logout1.cgi\">"+
+     "<input type=\"submit\" name=\"logout\" value=\"Logout\">"+
+     "</form><br>"+
+     "<form method=\"post\" action=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/purchase.cgi\">"+
+     "<input type=\"hidden\" name=\"name_user\" value=\""+args[1].toLowerCase().trim()+"\"><br>"+
+     "<table align=\"center\" style=\"width:60%\" border=\"3\">"+
+     "<tr>"+
+     "<th>Select Game</th>"+
+     "<th>Game Title</th>"+
+     "<th>Game Price</th>"+
+     "<th>Quantity</th>"+
+     "</tr>";
+     try
+     {
+     if((args[0].compareTo("")) == 0)
+     {
+        stmt = conn.createStatement();
+        query = "select g.game_info.asin_game,g.title,g.game_info.game_price from game g";
+        rset = stmt.executeQuery(query);
+        int q = 0;
+        while(rset.next())
+        {
+          q++;
+          s1 += "<tr><td align=\"center\"><input type=\"checkbox\" name=\"game_id_"+q+"\" value=\"'"+rset.getString(1)+"'\"></td>"+
+                "<td align=\"center\"><a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_game_data.cgi?game_id="+rset.getString(1)+"\">"+rset.getString(2)+"</td>"+
+                "<td align=\"center\">"+rset.getDouble(3)+"</td>"+
+                "<td align=\"center\"><input type=\"textbox\" name=\"quantity_"+q+"\"></td></tr>"; 
+        }
+        s1 += "<input type=\"hidden\" name=\"row_count\" value=\""+q+"\">";
+        rset.close();
+        stmt.close();
+     }
+     else
+     {
+        String[] in_seperation = args[0].toLowerCase().trim().split(" ");
+        ArrayList<Game> games_list = new ArrayList<Game>();
+        for(int i=0; i<in_seperation.length ; i++)
+        {  stmt = conn.createStatement();
+           query = "select d.developer_id.develop_id,d.developer_name from developer d where d.developer_name like '%"+in_seperation[i]+"%'";
+           rset = stmt.executeQuery(query);
+           while(rset.next())
+           {
+             stmt1 = conn.createStatement();
+             query1 = "select g.game_info.asin_game,g.title,g.game_info.game_price from table(select games_list from developer d where d.developer_id.develop_id = "+rset.getInt(1)+")t join game g on t.asin_game = g.game_info.asin_game";
+             rset1 = stmt1.executeQuery(query1);
+             while(rset1.next())
+             {
+               Game g = new Game();
+               g.g_id = rset1.getString(1);
+               g.g_name = rset1.getString(2);
+               g.g_price = rset1.getDouble(3);
+	       g.count = 1;
+               games_list.add(g);
+             }
+             rset1.close();
+             stmt1.close();
+           }   
+        }
+        if(games_list.isEmpty())
+        {
+          s1 += "<strong> There are no games developed by these developers. </strong>";
+        }
+        else
+        {
+        for(int k=0; k<games_list.size(); k++)
+        {
+          if(games_list.get(k) != null)
+          {
+            for(int l=k+1; l<games_list.size(); l++)
+            { 
+              if(games_list.get(l) != null)
+              {
+                 if(games_list.get(k).g_id.equals(games_list.get(l).g_id))
+                 { 
+	            games_list.get(k).count++;
+                    games_list.set(l,null);
+                 }
+              }
+            } 
+          }
+        }
+	for(int i=0;i<games_list.size();i++)
+	{ 
+         for(int j=i+1;j<games_list.size();j++) 
+         {
+           Game temp = null;
+           if((games_list.get(j-1) != null) && (games_list.get(j) != null ))
+           {  
+	      if(games_list.get(j-1).count <  games_list.get(j).count)
+	      {
+                 temp = games_list.get(j-1);
+                 games_list.set(j-1,games_list.get(j));
+                 games_list.set(j,temp);
+	      }
+       	   }
+         } 
+        } 
+        int q = 0;
+        for(int i=0;i<games_list.size();i++)
+        {
+	  if(games_list.get(i) != null)
+	  {
+            q++;
+            //System.out.println("game name " +games_list.get(i).g_name+ ": count " +games_list.get(i).count);
+            s1 += "<tr><td align=\"center\"><input type=\"checkbox\" name=\"game_id_"+q+"\" value=\"'"+games_list.get(i).g_id+"'\"></td>"+
+            "<td align=\"center\"><a href=\"http://people.aero.und.edu/~mdasannagari/cgi-bin/513/1/list_game_data.cgi?game_id="+games_list.get(i).g_id+"\">"+games_list.get(i).g_name+"</td>"+
+            "<td align=\"center\">"+games_list.get(i).g_price+"</td>"+
+            "<td align=\"center\"><input type=\"textbox\" name=\"quantity_"+q+"\"></td></tr>";    
+          }
+        }
+        s1 += "<input type=\"hidden\" name=\"row_count\" value=\""+q+"\">";
+        }
+      } 
+        s1 += "</table><br><input type=\"submit\" name=\"purchase\" value=\"Purchase\">&ensp;"+
+              "<input type=\"reset\" name=\"res\" value=\"Reset\">"+
+              "</form>"+
+              "</center>"+
+              "</body>"+
+              "</html>";
+        System.out.println(s1);
+     }
+     catch(SQLException ex)
+     {
+        System.out.print(ex);
+     }
+     conn.close();   
+   }       
+}
+
+
+
+
+
+
+#!/bin/bash
+CLASSPATH=.:/usr/lib/oracle/12.1/client64
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ojdbc7.jar
+CLASSPATH=$CLASSPATH:/usr/lib/oracle/12.1/client64/lib/ottclasses.zip
+export CLASSPATH
+
+/usr/bin/perl  purchase.pl
+
+
+
+
+
+
+
+#!/usr/bin/perl
+use CGI;
+$query = new CGI;
+$act = $query->param('purchase');
+$name_user = $query->param('name_user');
+$row_count = $query->param('row_count');
+my $yes_no = true;
+my $counter = 0;
+if($act eq "Purchase")
+{
+ print("Content-type: text/html\n\n");
+ $name_user =~ s/^\s*(\S*)\s*$/$1/;
+ $name_user =~ s/;|>|>>|<|\*|\?|\&|\|//g;
+ $cmd = "/usr/bin/java -Djava.security.egd=file:/dev/./urandom Purchase '$name_user'";
+ for(my $q=1; $q <= $row_count; $q++)
+ {
+   $game_id = $query->param('game_id_'.$q);
+   $quantity = $query->param('quantity_'.$q);
+   if($game_id eq "")
+   {
+       $counter++;
+   }
+   else 
+   {
+     if($quantity eq "")
+     {
+       $yes_no = false;
+       break;
+     }
+     else
+     {
+       $cmd1 .= " $game_id ";
+       $cmd1 .= " $quantity ";
+     }
+   }
+ }
+ if($counter == $row_count)
+ {
+    $cmd1 = " ";
+ }
+ if($yes_no eq false)
+ {
+    $cmd1 = " $yes_no "; 
+ }
+ $cmd .= $cmd1;
+ #print($cmd);
+ system($cmd);
+}
+
+
+
+
+
+
+import  java.sql.*;
+import  java.io.*;
+import  java.util.*;
+import  oracle.jdbc.*;
+import  oracle.jdbc.pool.OracleDataSource;
+class Purchase
+{
+  public static void main(String[] args) throws SQLException
+  {
+     Statement stmt,stmt1,stmt2;
+     String query,query1,query2;
+     String user     = "mdasannagari";
+     String password     = "manohar0606";
+     String database = "oracle1.aero.und.edu:1521/cs513.aero.und.edu";
+     // Open an OracleDataSource and get a connection.
+     OracleDataSource ods = new OracleDataSource( );
+     ods.setURL("jdbc:oracle:thin:@" + database);
+     ods.setUser(user);
+     ods.setPassword(password); 
+     Connection conn = ods.getConnection( );  
+     String s1= "<!DOCTYPE html>"+
+     "<html>"+
+     "<head>"+
+     "</head>"+
+     "<body>"+
+     "<center>";
+     try
+     {
+       if(args.length == 1)
+       {
+         s1 += "<strong> NO game has been selected and the corresponding quantity has not been entered. </strong>";
+       }
+       else if(args[1].toLowerCase().trim().compareTo("false") == 0)
+       {
+         s1 += "<strong> Some game or games have been selected but their corresponding quantities haven't been entered. </strong>"; 
+       }	
+       else
+       { 
+         stmt = conn.createStatement();
+         stmt1 = conn.createStatement();
+         stmt2 = conn.createStatement();
+         int number_rows_affected = 0;
+         for(int i=1; i<args.length; i+=2)
+         {
+            query1 = "select c.customer_name,cac.game_purchased.asin_game from customer c,table(c.account)cac where c.customer_name = '"+args[0].toLowerCase().trim()+"' and cac.game_purchased.asin_game = '"+args[i].toLowerCase().trim()+"'";
+	//	System.out.println("checkq" + query1 );  
+            ResultSet rset1 = stmt1.executeQuery(query1);
+            int new_quantity;
+            if(rset1.next())
+            {
+               new_quantity = Integer.parseInt(args[i+1]);
+               if(new_quantity > 0)
+               {
+                  query2 = "update table(select c.account from customer c where c.customer_name = '"+args[0].toLowerCase().trim()+"')a set a.quantity = "+args[i+1].toLowerCase().trim()+" where a.game_purchased.asin_game = '"+args[i].toLowerCase().trim()+"'";
+	       	 // System.out.println("updateq:" + query2);
+                  number_rows_affected = stmt2.executeUpdate(query2);
+               }
+               else if(new_quantity == 0)
+               {
+                  s1 += "<strong> You have entered quantity as 0. Please give positive quantity. </strong>";
+               }
+               else
+               {
+                  s1 += "<strong> You have entered negative quantity. Please enter positive quantity greater than 0. </strong>";
+               }
+            }
+            else
+            {
+               new_quantity = Integer.parseInt(args[i+1]);
+               if(new_quantity > 0)
+               {
+                  query = "insert into table (select c.account from customer c where c.customer_name = '"+args[0].toLowerCase().trim()+"') select g.game_info,"+args[i+1].toLowerCase().trim()+" from game g where g.game_info.asin_game = '"+args[i].toLowerCase().trim()+"'";
+                 // System.out.println("insertq:" + query);
+                  number_rows_affected = stmt.executeUpdate(query);
+               }
+               else if(new_quantity == 0)
+               {
+                  s1 += "<strong> You have entered quantity as 0. Please give positive quantity. </strong>";
+               }
+               else
+               {
+                  s1 += "<strong> You have entered negative quantity. Please enter positive quantity greater than 0. </strong>";
+               }
+            }
+            rset1.close();
+         }
+         stmt1.close();
+         stmt2.close();
+         stmt.close();
+         if(number_rows_affected == 0)
+         {
+            s1 += "<br><strong>The game cannot be purchased beacuse of error.<strong>";
+         }
+         else
+         {
+            s1 += "<strong>Purchase completed successfully.</strong>";
+         }  
+       }
+       s1 += "</center>"+
+       "</body>"+
+       "</html>";
+       System.out.print(s1);
+     }
+     catch(SQLException ex)
+     {
+        System.out.print(ex);
+     }
+     conn.close();   
+   }       
+}   
